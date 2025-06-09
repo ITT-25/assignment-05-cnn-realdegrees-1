@@ -26,18 +26,21 @@ assignment-05-cnn-realdegrees-1/
 
 # Exploring Hyperparameters (number of convolution layers)
 
-1. Complete the setup steps above
+> 💡 You should be able to simply open and read the notebook without running these steps
+
+*Optional*
+1. Complete the setup steps
 2. Select the virtual environment as the kernel for the notebook
 3. Run all cells
 
-> 💡 Documentation on this task can be found in the notebook
-
 # Gathering a Dataset 
 
-```sh
-cd 02-dataset
-python -------------
-```
+> 💡 You should be able to simply open and read the notebook without running these steps
+
+*Optional*
+1. Complete the setup steps
+2. Select the virtual environment as the kernel for the notebook
+3. Run all cells
 
 # Gesture-based Media Controls
 
