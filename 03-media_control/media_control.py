@@ -5,6 +5,8 @@ import click
 from pynput.keyboard import Key
 from src.gesture_model import GestureModel
 from src.hand_detector import HandDetector
+from src.cooldown_timer import CooldownTimer
+from src.gesture_queue import GestureQueue
 
 # Disable tensorflow and mediapipe warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 0 = all logs, 1 = filter INFO, 2 = filter WARNING, 3 = filter ERROR
@@ -22,6 +24,8 @@ GESTURE_ACTIONS = {
     "two_up": Key.media_volume_up
 }
 
+gesture_queue = GestureQueue(maxlen=50, threshold=0.8)
+cooldown_timer = CooldownTimer(cooldown=2.0)
 gesture_model = GestureModel(SIZE, COLOR_CHANNELS, TRAINING_DATA_PATH, GESTURE_ACTIONS)
 hand_detector = HandDetector()
 
@@ -46,7 +50,10 @@ def main(video_id: int) -> None:
         # Detect hand bounding box
         bbox = hand_detector.detect_hand_bbox(frame)
         
-
+        # If no hand is detected, clear the gesture queue
+        if not bbox:
+            gesture_queue.clear()
+        
         cv2.imshow("Gesture Recognition", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
