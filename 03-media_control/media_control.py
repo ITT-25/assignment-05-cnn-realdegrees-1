@@ -7,6 +7,7 @@ from src.gesture_model import GestureModel
 from src.hand_detector import HandDetector
 from src.cooldown_timer import CooldownTimer
 from src.gesture_queue import GestureQueue
+from src.ui_drawer import UIDrawer
 
 # Disable tensorflow and mediapipe warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 0 = all logs, 1 = filter INFO, 2 = filter WARNING, 3 = filter ERROR
@@ -28,6 +29,7 @@ gesture_queue = GestureQueue(maxlen=50, threshold=0.8)
 cooldown_timer = CooldownTimer(cooldown=2.0)
 gesture_model = GestureModel(SIZE, COLOR_CHANNELS, TRAINING_DATA_PATH, GESTURE_ACTIONS)
 hand_detector = HandDetector()
+ui_drawer = UIDrawer(gesture_queue, GESTURE_ACTIONS, cooldown_timer)
 
 @click.command()
 @click.option('--video-id', '-c', default=0, help='ID of the webcam you want to use', type=int, show_default=True)
@@ -54,6 +56,7 @@ def main(video_id: int) -> None:
         if not bbox:
             gesture_queue.clear()
         
+        ui_drawer.draw_cooldown_bar(frame)
         cv2.imshow("Gesture Recognition", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
