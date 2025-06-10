@@ -68,5 +68,5 @@ Actions, cooldown and additional relevant info is displayed in a window.
 
 > 💡 Hand bounding box detection and gesture recognition works quite well in darker conditions but it is *highly* recommended to be in a bright environment
 
-**Known Issues**
+**Known Issues**  
 There are some tensorflow and mediapipe warning logs that I was unable to get rid of without a bunch of unnecessary guards and environment variable overrides so I just kept them there, they can be ignored.

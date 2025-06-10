@@ -3,6 +3,7 @@ from pynput.keyboard import Controller
 from src.cooldown_timer import CooldownTimer
 from src.gesture_queue import GestureQueue
 
+
 class MediaController:
     def __init__(self, gesture_actions, cooldown_timer: CooldownTimer, gesture_queue: GestureQueue):
         self.gesture_actions = gesture_actions

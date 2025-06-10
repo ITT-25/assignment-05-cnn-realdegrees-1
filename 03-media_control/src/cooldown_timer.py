@@ -5,7 +5,7 @@ class CooldownTimer:
     def __init__(self, cooldown: float):
         self.cooldown = cooldown
         self.last_action_time = 0.0
-        self.last_action_label = ''
+        self.last_action_label = ""
 
     def ready(self) -> bool:
         return (time.time() - self.last_action_time) >= self.cooldown

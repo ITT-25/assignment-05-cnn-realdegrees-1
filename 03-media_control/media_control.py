@@ -12,8 +12,8 @@ from src.frame_processor import FrameProcessor
 from src.ui_drawer import UIDrawer
 
 # Disable tensorflow and mediapipe warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 0 = all logs, 1 = filter INFO, 2 = filter WARNING, 3 = filter ERROR
-logging.getLogger('absl').setLevel(logging.ERROR)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # 0 = all logs, 1 = filter INFO, 2 = filter WARNING, 3 = filter ERROR
+logging.getLogger("absl").setLevel(logging.ERROR)
 
 # Configuration
 IMG_SIZE = 64
@@ -24,7 +24,7 @@ GESTURE_ACTIONS = {
     "stop": Key.media_stop,
     "fist": Key.media_play_pause,
     "peace": Key.media_volume_down,
-    "two_up": Key.media_volume_up
+    "two_up": Key.media_volume_up,
 }
 
 gesture_queue = GestureQueue(maxlen=50, threshold=0.8)
@@ -32,11 +32,14 @@ cooldown_timer = CooldownTimer(cooldown=2.0)
 gesture_model = GestureModel(SIZE, COLOR_CHANNELS, TRAINING_DATA_PATH, GESTURE_ACTIONS)
 hand_detector = HandDetector()
 media_controller = MediaController(GESTURE_ACTIONS, cooldown_timer, gesture_queue)
-frame_processor = FrameProcessor(hand_detector, gesture_model, gesture_queue, media_controller, GESTURE_ACTIONS, COLOR_CHANNELS)
+frame_processor = FrameProcessor(
+    hand_detector, gesture_model, gesture_queue, media_controller, GESTURE_ACTIONS, COLOR_CHANNELS
+)
 ui_drawer = UIDrawer(gesture_queue, GESTURE_ACTIONS, cooldown_timer)
 
+
 @click.command()
-@click.option('--video-id', '-c', default=0, help='ID of the webcam you want to use', type=int, show_default=True)
+@click.option("--video-id", "-c", default=0, help="ID of the webcam you want to use", type=int, show_default=True)
 def main(video_id: int) -> None:
     print(f"Starting webcam capture with camera ID: {video_id}")
     cap = cv2.VideoCapture(video_id)
@@ -55,11 +58,11 @@ def main(video_id: int) -> None:
 
         # Detect hand bounding box
         bbox = hand_detector.detect_hand_bbox(frame)
-        
+
         # If no hand is detected, clear the gesture queue
         if not bbox:
             gesture_queue.clear()
-        
+
         # Process the frame and get predictions
         result = frame_processor.process(frame, bbox)
         if isinstance(result, tuple):
@@ -70,14 +73,15 @@ def main(video_id: int) -> None:
                 gesture_queue.append(label)
                 if gesture_queue.is_full_and_consistent(label) and label in GESTURE_ACTIONS:
                     media_controller.handle_prediction(label, gesture_queue.queue)
-                    
+
         ui_drawer.draw_cooldown_bar(frame)
         cv2.imshow("Gesture Recognition", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-        
+
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()

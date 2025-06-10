@@ -1,6 +1,7 @@
 from collections import deque
 from typing import Deque, Dict
 
+
 class GestureQueue:
     def __init__(self, maxlen: int, threshold: float = 1.0):
         self.queue: Deque[str] = deque(maxlen=maxlen)
@@ -16,7 +17,7 @@ class GestureQueue:
 
     def is_full_and_consistent(self, label: str) -> bool:
         return len(self.queue) == self.queue.maxlen and self.progress(label) >= 1.0
-    
+
     def distribution(self) -> Dict[str, float]:
         if not self.queue:
             return {}
@@ -24,6 +25,6 @@ class GestureQueue:
 
     def clear(self):
         self.queue.clear()
-        
+
     def __len__(self) -> int:
         return len(self.queue)

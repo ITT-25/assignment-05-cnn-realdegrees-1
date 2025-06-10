@@ -13,6 +13,7 @@ import threading
 import queue
 from keras.metrics import categorical_crossentropy
 
+
 class GestureModel:
     def __init__(self, size: Tuple[int, int], color_channels: int, dataset_path: str, gesture_actions: dict):
         self.model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "gesture_model.keras")
@@ -24,11 +25,11 @@ class GestureModel:
         self.label_names = []
         self.img: np.ndarray = None
         self.prediction_queue = queue.Queue(maxsize=1)
-        self._latest_prediction : Tuple[str, float] = None
+        self._latest_prediction: Tuple[str, float] = None
 
         # Load existing model or train a new one
         self._load()
-        
+
         # Start prediction thread
         self._stop_event = threading.Event()
         self._prediction_thread = threading.Thread(target=self._prediction_loop, daemon=True)
@@ -42,7 +43,9 @@ class GestureModel:
         else:
             print("No existing model found, training a new one...")
             print("Loading and preparing dataset...")
-            X_train, X_test, y_train, y_test, self.label_names = self.load_dataset(self.dataset_path, self.gesture_actions)
+            X_train, X_test, y_train, y_test, self.label_names = self.load_dataset(
+                self.dataset_path, self.gesture_actions
+            )
             print("Building and training model...")
             self.model = self.build_model(X_train, X_test, y_train, y_test)
 
@@ -52,7 +55,9 @@ class GestureModel:
             img_gray = cv2.cvtColor(img_resized, cv2.COLOR_BGR2GRAY)
         return img_gray
 
-    def load_dataset(self, dataset_path: str, gesture_actions: dict) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list]:
+    def load_dataset(
+        self, dataset_path: str, gesture_actions: dict
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list]:
         images = []
         labels = []
         label_names = []
@@ -80,7 +85,7 @@ class GestureModel:
                     label_index = label_names.index(label)
                     images.append(preprocessed)
                     labels.append(label_index)
-        X = np.array(images).astype("float32") / 255.
+        X = np.array(images).astype("float32") / 255.0
         y = np.array(labels)
         X = X.reshape(-1, self.size[0], self.size[1], self.color_channels)
         y_one_hot = to_categorical(y)
@@ -92,17 +97,17 @@ class GestureModel:
         epochs = 100
         num_classes = y_train.shape[1]
         input_shape = X_train.shape[1:]  # Get input shape from data
-        
+
         # Use LeakyReLU for conv layers, ReLU for dense
         activation = "relu"
         activation_conv = "leaky_relu"
-        
+
         model = Sequential()
-        
+
         # Input layer + Data Augmentation
         model.add(Input(shape=input_shape))
         model.add(RandomFlip("horizontal"))
-        
+
         # Convolutional Blocks
         # Block 1
         model.add(Conv2D(32, (3, 3), activation=activation_conv, padding="same"))
@@ -111,7 +116,7 @@ class GestureModel:
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.25))
-        
+
         # Block 2
         model.add(Conv2D(64, (3, 3), activation=activation_conv, padding="same"))
         model.add(BatchNormalization())
@@ -119,7 +124,7 @@ class GestureModel:
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.25))
-        
+
         # Block 3
         model.add(Conv2D(128, (3, 3), activation=activation_conv, padding="same"))
         model.add(BatchNormalization())
@@ -127,7 +132,7 @@ class GestureModel:
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.3))
-        
+
         # Block 4
         model.add(Conv2D(256, (3, 3), activation=activation_conv, padding="same"))
         model.add(BatchNormalization())
@@ -135,40 +140,28 @@ class GestureModel:
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.3))
-        
-        
+
         # Fully connected layers
         model.add(Flatten())
         model.add(Dense(512, activation=activation))
         model.add(BatchNormalization())
         model.add(Dropout(0.5))
-        
+
         model.add(Dense(256, activation=activation))
         model.add(BatchNormalization())
         model.add(Dropout(0.5))
-        
+
         # Output layer
         model.add(Dense(num_classes, activation="softmax"))
-        
+
         # Optimizer with lower learning rate
         model.compile(loss=categorical_crossentropy, optimizer="adam", metrics=["accuracy"])
-        
+
         # Callbacks
-        reduce_lr = ReduceLROnPlateau(
-            monitor="val_loss", 
-            factor=0.5, 
-            patience=10, 
-            min_lr=1e-6,
-            verbose=1
-        )
-        
-        stop_early = EarlyStopping(
-            monitor="val_loss",
-            patience=15,
-            restore_best_weights=True,
-            verbose=1
-        )
-        
+        reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=10, min_lr=1e-6, verbose=1)
+
+        stop_early = EarlyStopping(monitor="val_loss", patience=15, restore_best_weights=True, verbose=1)
+
         print("Training model...")
         model.fit(
             X_train,
@@ -177,16 +170,16 @@ class GestureModel:
             epochs=epochs,
             verbose=1,
             validation_data=(X_test, y_test),
-            callbacks=[reduce_lr, stop_early]
+            callbacks=[reduce_lr, stop_early],
         )
-        
+
         print(f"Saving model to {self.model_path}...")
         model.save(self.model_path)
         return model
-    
+
     def set_img(self, img: np.ndarray):
         self.img = img
-        
+
     def _prediction_loop(self):
         while not self._stop_event.is_set():
             if self.img is not None and self.model is not None:
@@ -211,4 +204,3 @@ class GestureModel:
         if img is not None:
             self.set_img(img)
         return self._latest_prediction
-
