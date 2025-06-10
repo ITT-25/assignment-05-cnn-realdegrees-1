@@ -8,6 +8,7 @@ from src.hand_detector import HandDetector
 from src.cooldown_timer import CooldownTimer
 from src.gesture_queue import GestureQueue
 from src.media_controller import MediaController
+from src.frame_processor import FrameProcessor
 from src.ui_drawer import UIDrawer
 
 # Disable tensorflow and mediapipe warnings
@@ -31,6 +32,7 @@ cooldown_timer = CooldownTimer(cooldown=2.0)
 gesture_model = GestureModel(SIZE, COLOR_CHANNELS, TRAINING_DATA_PATH, GESTURE_ACTIONS)
 hand_detector = HandDetector()
 media_controller = MediaController(GESTURE_ACTIONS, cooldown_timer, gesture_queue)
+frame_processor = FrameProcessor(hand_detector, gesture_model, gesture_queue, media_controller, GESTURE_ACTIONS, COLOR_CHANNELS)
 ui_drawer = UIDrawer(gesture_queue, GESTURE_ACTIONS, cooldown_timer)
 
 @click.command()
@@ -58,7 +60,16 @@ def main(video_id: int) -> None:
         if not bbox:
             gesture_queue.clear()
         
-
+        # Process the frame and get predictions
+        result = frame_processor.process(frame, bbox)
+        if isinstance(result, tuple):
+            frame, (x, y, w, h, label, confidence) = result
+            media_controller.update_state()
+            if not media_controller.in_cooldown() and confidence > 80:
+                gesture_queue.append(label)
+                if gesture_queue.is_full_and_consistent(label) and label in GESTURE_ACTIONS:
+                    media_controller.handle_prediction(label, gesture_queue.queue)
+                    
         ui_drawer.draw_cooldown_bar(frame)
         cv2.imshow("Gesture Recognition", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
