@@ -46,5 +46,27 @@ assignment-05-cnn-realdegrees-1/
 
 ```sh
 cd 03-media_control
-python media_control.py
+python media_control.py --video-id 0
 ```
+
+This program launches a preview of your webcam highlighting the bounding box of the first hand that comes into view.  
+The image is then cropped to the bounding box, preprocessed and fed into a CNN to determine the gesture.  
+If a gesture is consistenly detected for a certain amount of frames an action is performed.
+An internal cooldown system on top of the detection time threshold prevents unintended inputs.  
+Based on the type of gesture a media action is performed using `pynput`.  
+
+```py
+GESTURE_ACTIONS = {
+    "stop": Key.media_stop,
+    "fist": Key.media_play_pause,
+    "peace": Key.media_volume_down,
+    "two_up": Key.media_volume_up
+}
+```
+
+Actions, cooldown and additional relevant info is displayed in a window.
+
+> 💡 Hand bounding box detection and gesture recognition works quite well in darker conditions but it is *highly* recommended to be in a bright environment
+
+**Known Issues**
+There are some tensorflow and mediapipe warning logs that I was unable to get rid of without a bunch of unnecessary guards and environment variable overrides so I just kept them there, they can be ignored.
