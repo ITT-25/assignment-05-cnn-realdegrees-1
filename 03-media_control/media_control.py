@@ -64,6 +64,7 @@ def main(video_id: int) -> None:
         result = frame_processor.process(frame, bbox)
         if isinstance(result, tuple):
             frame, (x, y, w, h, label, confidence) = result
+            ui_drawer.draw_label_and_progress(frame, x, y, w, h, label, confidence)
             media_controller.update_state()
             if not media_controller.in_cooldown() and confidence > 80:
                 gesture_queue.append(label)

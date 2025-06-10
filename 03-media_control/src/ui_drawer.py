@@ -11,6 +11,18 @@ class UIDrawer:
         self.gesture_actions = gesture_actions
         self.cooldown_timer = cooldown_timer
 
+    def draw_label_and_progress(self, frame: np.ndarray, x: int, y: int, w: int, h: int, label: str, confidence: float) -> None:
+        text = f"{label}: {confidence:.2f}%"
+        cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+        if label in self.gesture_actions:
+            progress = self.gesture_queue.progress(label)
+            overlay = frame.copy()
+            fill_height = int(h * progress)
+            if fill_height > 0:
+                alpha = 0.4
+                cv2.rectangle(overlay, (x, y + h - fill_height), (x + w, y + h), (0, 255, 0), -1)
+                cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+
     def draw_cooldown_bar(self, frame: np.ndarray) -> None:
         cooldown = self.cooldown_timer.get_progress()
         bar_width = int(frame.shape[1] * ((self.cooldown_timer.cooldown - cooldown) / self.cooldown_timer.cooldown))
