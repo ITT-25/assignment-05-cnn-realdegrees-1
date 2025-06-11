@@ -12,6 +12,8 @@ from keras.callbacks import ReduceLROnPlateau, EarlyStopping
 import threading
 import queue
 from keras.metrics import categorical_crossentropy
+from sklearn.preprocessing import LabelEncoder
+import joblib
 
 IMG_SIZE = 64
 SIZE = (IMG_SIZE, IMG_SIZE)
@@ -19,12 +21,13 @@ SIZE = (IMG_SIZE, IMG_SIZE)
 class GestureModel:
     def __init__(self, color_channels: int, dataset_path: str, gesture_actions: dict):
         self.model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "gesture_model.keras")
+        self.label_encoder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "label_encoder.pkl")
         self.size = SIZE
         self.color_channels = color_channels
         self.dataset_path = dataset_path
         self.gesture_actions = gesture_actions
         self.model = None
-        self.label_names = []
+        self.label_encoder = None
         self.img: np.ndarray = None
         self.prediction_queue = queue.Queue(maxsize=1)
         self._latest_prediction: Tuple[str, float] = None
@@ -38,31 +41,36 @@ class GestureModel:
         self._prediction_thread.start()
 
     def _load(self):
-        if os.path.exists(self.model_path):
+        if os.path.exists(self.model_path) and os.path.exists(self.label_encoder_path):
             print(f"Loading saved model from {self.model_path}...")
             self.model = load_model(self.model_path)
-            _, _, _, _, self.label_names = self.load_dataset(self.dataset_path, self.gesture_actions)
+            self.label_encoder = joblib.load(self.label_encoder_path)
         else:
             print("No existing model found, training a new one...")
             print("Loading and preparing dataset...")
-            X_train, X_test, y_train, y_test, self.label_names = self.load_dataset(
+            X_train, X_test, y_train, y_test, self.label_encoder = self.load_dataset(
                 self.dataset_path, self.gesture_actions
             )
+            
             print("Building and training model...")
             self.model = self.build_model(X_train, X_test, y_train, y_test)
-
+            
+            print("Saving model and encoder...")
+            self.model.save(self.model_path)
+            joblib.dump(self.label_encoder, self.label_encoder_path)
+        
     def preprocess_image(self, img: np.ndarray) -> np.ndarray:
         img_resized = cv2.resize(img, self.size)
         if self.color_channels == 1:
             img_gray = cv2.cvtColor(img_resized, cv2.COLOR_BGR2GRAY)
-        return img_gray
+            return img_gray
+        return img_resized
 
     def load_dataset(
         self, dataset_path: str, gesture_actions: dict
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, LabelEncoder]:
         images = []
         labels = []
-        label_names = []
         for condition in gesture_actions.keys():
             with open(f"{dataset_path}/_annotations/{condition}.json") as f:
                 annotations = json.load(f)
@@ -82,17 +90,17 @@ class GestureModel:
                     crop = img[y1:y2, x1:x2]
                     preprocessed = self.preprocess_image(crop)
                     label = annotation["labels"][i]
-                    if label not in label_names:
-                        label_names.append(label)
-                    label_index = label_names.index(label)
                     images.append(preprocessed)
-                    labels.append(label_index)
+                    labels.append(label)
         X = np.array(images).astype("float32") / 255.0
         y = np.array(labels)
         X = X.reshape(-1, self.size[0], self.size[1], self.color_channels)
-        y_one_hot = to_categorical(y)
+        # Fit label encoder
+        label_encoder = LabelEncoder()
+        y_encoded = label_encoder.fit_transform(y)
+        y_one_hot = to_categorical(y_encoded)
         X_train, X_test, y_train, y_test = train_test_split(X, y_one_hot, test_size=0.2, random_state=42)
-        return X_train, X_test, y_train, y_test, label_names
+        return X_train, X_test, y_train, y_test, label_encoder
 
     def build_model(self, X_train: np.ndarray, X_test: np.ndarray, y_train: np.ndarray, y_test: np.ndarray):
         batch_size = 32
@@ -175,8 +183,6 @@ class GestureModel:
             callbacks=[reduce_lr, stop_early],
         )
 
-        print(f"Saving model to {self.model_path}...")
-        model.save(self.model_path)
         return model
 
     def set_img(self, img: np.ndarray):
@@ -184,12 +190,13 @@ class GestureModel:
 
     def _prediction_loop(self):
         while not self._stop_event.is_set():
-            if self.img is not None and self.model is not None:
+            if self.img is not None and self.model is not None and self.label_encoder is not None:
                 hand_img = np.expand_dims(self.img, axis=0) / 255.0
                 prediction = self.model.predict(hand_img, verbose=0)
                 label_index = int(np.argmax(prediction))
                 confidence = float(prediction[0][label_index] * 100)
-                result = (self.label_names[label_index], confidence)
+                label = self.label_encoder.inverse_transform([label_index])[0]
+                result = (label, confidence)
                 self._latest_prediction = result
                 # Replace old prediction if queue is full
                 if self.prediction_queue.full():
@@ -202,7 +209,7 @@ class GestureModel:
             else:
                 threading.Event().wait(0.01)
 
-    def get_prediction(self, img: Optional[np.ndarray] = None) -> Optional[Tuple[int, float]]:
+    def get_prediction(self, img: Optional[np.ndarray] = None) -> Optional[Tuple[str, float]]:
         if img is not None:
             self.set_img(img)
         return self._latest_prediction
