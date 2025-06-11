@@ -50,6 +50,8 @@ assignment-05-cnn-realdegrees-1/
 
 # Gesture-based Media Controls
 
+> ⚠️ The model is precompiled and included in the repo. Delete [gesture_model.keras](./03-media_control/gesture_model.keras) before starting to train again (Takes a while due to added layers)
+
 ```sh
 cd 03-media_control
 python media_control.py --video-id 0
