@@ -33,11 +33,13 @@ ui_drawer = UIDrawer(gesture_queue, GESTURE_ACTIONS, cooldown_timer)
 
 @click.command()
 @click.option("--video-id", "-c", default=0, help="ID of the webcam you want to use", type=int, show_default=True)
-def main(video_id: int) -> None:
+@click.option("--cam-width", "-w", default=640, help="Width of the webcam frame", type=int, show_default=True)
+@click.option("--cam-height", "-h", default=480, help="Height of the webcam frame", type=int, show_default=True)
+def main(video_id: int, cam_width: int, cam_height: int) -> None:
     print(f"Starting webcam capture with camera ID: {video_id}")
     cap = cv2.VideoCapture(video_id)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, cam_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam_height)
 
     if not cap.isOpened():
         print(f"Error: Could not open camera with ID {video_id}")

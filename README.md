@@ -54,8 +54,11 @@ assignment-05-cnn-realdegrees-1/
 
 ```sh
 cd 03-media_control
-python media_control.py --video-id 0
+python media_control.py --video-id 0 -w 640 -h 480
 ```
+
+The `-w` and `-h` parameters determine the size of your webcam. They default to `640x480` and can be set to the rough resolution of your webcam to improve visuals.  
+The webcam resolution has no impact on the classification performance of the program.  
 
 This program launches a preview of your webcam highlighting the bounding box of the first hand that comes into view.  
 The image is then cropped to the bounding box, preprocessed and fed into a CNN to determine the gesture.  
