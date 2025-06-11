@@ -50,7 +50,8 @@ assignment-05-cnn-realdegrees-1/
 
 # Gesture-based Media Controls
 
-> ⚠️ The model is precompiled and included in the repo. Delete [gesture_model.keras](./03-media_control/gesture_model.keras) before starting to train again (Takes a while due to added layers)
+This application can be used for media controls using your webcam feed to detect gestures that are mapped to media controls.  
+To run it, perform the setup steps above and then run the code below.  
 
 ```sh
 cd 03-media_control
@@ -66,18 +67,22 @@ If a gesture is consistenly detected for a certain amount of frames an action is
 An internal cooldown system on top of the detection time threshold prevents unintended inputs.  
 Based on the type of gesture a media action is performed using `pynput`.  
 
-```py
-GESTURE_ACTIONS = {
-    "stop": Key.media_stop,
-    "fist": Key.media_play_pause,
-    "peace": Key.media_volume_down,
-    "two_up": Key.media_volume_up
-}
-```
+### Controls
 
-Actions, cooldown and additional relevant info is displayed in a window.
+| Gesture | Action | Example |
+|---------|--------|---------|
+| stop | Stop Media Playback | <img src="docs/example_gestures/stop.jpg" width="150"> |
+| fist | Pause Media Playback | <img src="docs/example_gestures/fist.jpg" width="150"> |
+| peace | Volume Down | <img src="docs/example_gestures/peace.jpg" width="150"> |
+| two_up | Volume Up | <img src="docs/example_gestures/two_up.jpg" width="150"> |
+
+
+Performed actions, cooldown and additional relevant info is displayed in the application window.
 
 > 💡 Hand bounding box detection and gesture recognition works quite well in darker conditions but it is *highly* recommended to be in a bright environment
+
+> ⚠️ The model is precompiled, included in the repo and used by the application by default instead of training a new model.  
+Delete [gesture_model.keras](./03-media_control/gesture_model.keras) before launching to train a new model (Takes a while due to added layers)
 
 **Known Issues**  
 - There are some tensorflow and mediapipe warning logs that I was unable to get rid of without a bunch of unnecessary guards and environment variable overrides so I just kept them there, they can be ignored.
