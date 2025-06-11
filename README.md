@@ -71,7 +71,7 @@ Based on the type of gesture a media action is performed using `pynput`.
 
 Press `q` to close the application when the window is focused **or** use `Ctrl + C` to interrupt the python process. All other controls are handled by computervision.  
 
-*Actions can be remapped by editing the dictionary `GESTURE_ACTIONS` in [media_control.py](./03-media_control/media_control.py) (Delete old saved model to retrain)*
+*Actions can be remapped by editing the dictionary `GESTURE_ACTIONS` in [media_control.py](./03-media_control/media_control.py) (Delete old saved model and encoder to retrain)*
 
 ### Playback
 _________
@@ -95,7 +95,7 @@ Performed actions, cooldown and additional relevant info is displayed in the app
 > 💡 Hand bounding box detection and gesture recognition works quite well in darker conditions (as long as the contrast between hand and background is not too low) but it is *highly* recommended to be in a bright environment
 
 > ⚠️ The model is precompiled, included in the repo and used by the application by default instead of training a new model.  
-Delete [gesture_model.keras](./03-media_control/gesture_model.keras) before launching to train a new model (Takes a while due to added layers)
+Delete [gesture_model.keras](./03-media_control/gesture_model.keras) and [label_encoder.pkl](./03-media_control/label_encoder.pkl) before launching to train and save a new model
 
 **Known Issues**  
 - There are some tensorflow and mediapipe warning logs that I was unable to get rid of without a bunch of unnecessary guards and environment variable overrides so I just kept them there, they can be ignored.
