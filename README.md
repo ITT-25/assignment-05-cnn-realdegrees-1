@@ -6,7 +6,7 @@
 
 1. Clone the repo
 2. `cd` into the **root** directory
-3. Setup and activate a virtual env
+3. Setup and activate a virtual env **(Python 3.12)**
 4. `pip install -r requirements.txt`
 
 > 💡 `requirements.txt` includes `jupyter` and `ipykernel` so the virtual environment can also be used as a kernel for the notebooks in task 1 & 2
