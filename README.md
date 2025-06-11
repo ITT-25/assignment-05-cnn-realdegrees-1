@@ -67,19 +67,32 @@ If a gesture is consistenly detected for a certain amount of frames an action is
 An internal cooldown system on top of the detection time threshold prevents unintended inputs.  
 Based on the type of gesture a media action is performed using `pynput`.  
 
-### Controls
+## Controls
 
-| Gesture | Action | Example |
-|---------|--------|---------|
-| stop | Stop Media Playback | <img src="docs/example_gestures/stop.jpg" width="150"> |
-| fist | Pause/Play Media | <img src="docs/example_gestures/fist.jpg" width="150"> |
-| peace | Volume Down | <img src="docs/example_gestures/peace.jpg" width="150"> |
-| two_up | Volume Up | <img src="docs/example_gestures/two_up.jpg" width="150"> |
+Press `q` to close the application when the window is focused **or** use `Ctrl + C` to interrupt the python process. All other controls are handled by computervision.  
 
+*Actions can be remapped by editing the dictionary `GESTURE_ACTIONS` in [media_control.py](./03-media_control/media_control.py) (Delete old saved model to retrain)*
+
+### Playback
+_________
+| **Gesture** | **stop** | **fist** | **three** | **peace** |
+|-------------|----------|----------|-----------|-----------|
+| **Action**  | Stop Media Playback | Pause/Play Media | Previous Track | Next Track |
+| **Example** | <img src="docs/example_gestures/stop.jpg" height="200"> | <img src="docs/example_gestures/fist.jpg" height="200"> | <img src="docs/example_gestures/three.jpg" height="200"> | <img src="docs/example_gestures/peace.jpg" height="200"> |
+
+### Volume
+__________
+| **Gesture** | **rock** | **one** | **two_up** |
+|-------------|----------|---------|------------|
+| **Action**  | Mute Volume | Volume Down | Volume Up |
+| **Example** | <img src="docs/example_gestures/rock.jpg" height="200"> | <img src="docs/example_gestures/one.jpg" height="200"> | <img src="docs/example_gestures/two_up.jpg" height="200"> |  
+
+
+*Images sourced from training dataset*
 
 Performed actions, cooldown and additional relevant info is displayed in the application window.
 
-> 💡 Hand bounding box detection and gesture recognition works quite well in darker conditions but it is *highly* recommended to be in a bright environment
+> 💡 Hand bounding box detection and gesture recognition works quite well in darker conditions (as long as the contrast between hand and background is not too low) but it is *highly* recommended to be in a bright environment
 
 > ⚠️ The model is precompiled, included in the repo and used by the application by default instead of training a new model.  
 Delete [gesture_model.keras](./03-media_control/gesture_model.keras) before launching to train a new model (Takes a while due to added layers)
@@ -87,3 +100,4 @@ Delete [gesture_model.keras](./03-media_control/gesture_model.keras) before laun
 **Known Issues**  
 - There are some tensorflow and mediapipe warning logs that I was unable to get rid of without a bunch of unnecessary guards and environment variable overrides so I just kept them there, they can be ignored.
 - Program startup takes a while due to model loading, once the cv2 window opens the program is fully ready  
+- Windows media buttons do not support "starting" after media is "stopped", this means you will lose media control after doing the "stop" gesture until you manually start playback again. Using the "fist" gesture for pausing/resuming instead works much better. (This is not a limitation of the application but a design decision of the operating system)

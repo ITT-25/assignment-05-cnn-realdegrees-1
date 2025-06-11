@@ -16,8 +16,11 @@ TRAINING_DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".
 GESTURE_ACTIONS = {
     "stop": Key.media_stop,
     "fist": Key.media_play_pause,
-    "peace": Key.media_volume_down,
+    "one": Key.media_volume_down,
     "two_up": Key.media_volume_up,
+    "rock": Key.media_volume_mute,
+    "three": Key.media_previous,
+    "peace": Key.media_next,
 }
 
 gesture_queue = GestureQueue(maxlen=50, threshold=0.8)
