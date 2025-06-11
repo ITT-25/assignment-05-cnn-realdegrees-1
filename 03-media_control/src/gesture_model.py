@@ -13,11 +13,13 @@ import threading
 import queue
 from keras.metrics import categorical_crossentropy
 
+IMG_SIZE = 64
+SIZE = (IMG_SIZE, IMG_SIZE)
 
 class GestureModel:
-    def __init__(self, size: Tuple[int, int], color_channels: int, dataset_path: str, gesture_actions: dict):
+    def __init__(self, color_channels: int, dataset_path: str, gesture_actions: dict):
         self.model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "gesture_model.keras")
-        self.size = size
+        self.size = SIZE
         self.color_channels = color_channels
         self.dataset_path = dataset_path
         self.gesture_actions = gesture_actions

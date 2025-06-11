@@ -9,7 +9,7 @@
 3. Setup and activate a virtual env
 4. `pip install -r requirements.txt`
 
-> 💡 `requirements.txt` includes `jupyter` and `ipykernel` so the virtual environment can also be used as a kernel for the notebook in the first task
+> 💡 `requirements.txt` includes `jupyter` and `ipykernel` so the virtual environment can also be used as a kernel for the notebooks in task 1 & 2
 
 **Optional**  
 *Models and Notebooks are precompiled. These steps are only needed if you want to compile anything yourself*  
@@ -75,4 +75,5 @@ Actions, cooldown and additional relevant info is displayed in a window.
 > 💡 Hand bounding box detection and gesture recognition works quite well in darker conditions but it is *highly* recommended to be in a bright environment
 
 **Known Issues**  
-There are some tensorflow and mediapipe warning logs that I was unable to get rid of without a bunch of unnecessary guards and environment variable overrides so I just kept them there, they can be ignored.
+- There are some tensorflow and mediapipe warning logs that I was unable to get rid of without a bunch of unnecessary guards and environment variable overrides so I just kept them there, they can be ignored.
+- Program startup takes a while due to model loading, once the cv2 window opens the program is fully ready  

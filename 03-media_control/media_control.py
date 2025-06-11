@@ -1,6 +1,5 @@
 import cv2
 import os
-import logging
 import click
 from pynput.keyboard import Key
 from src.gesture_model import GestureModel
@@ -11,14 +10,8 @@ from src.media_controller import MediaController
 from src.frame_processor import FrameProcessor
 from src.ui_drawer import UIDrawer
 
-# Disable tensorflow and mediapipe warnings
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # 0 = all logs, 1 = filter INFO, 2 = filter WARNING, 3 = filter ERROR
-logging.getLogger("absl").setLevel(logging.ERROR)
-
 # Configuration
-IMG_SIZE = 64
 COLOR_CHANNELS = 1
-SIZE = (IMG_SIZE, IMG_SIZE)
 TRAINING_DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "gesture_dataset_sample")
 GESTURE_ACTIONS = {
     "stop": Key.media_stop,
@@ -29,7 +22,7 @@ GESTURE_ACTIONS = {
 
 gesture_queue = GestureQueue(maxlen=50, threshold=0.8)
 cooldown_timer = CooldownTimer(cooldown=2.0)
-gesture_model = GestureModel(SIZE, COLOR_CHANNELS, TRAINING_DATA_PATH, GESTURE_ACTIONS)
+gesture_model = GestureModel(COLOR_CHANNELS, TRAINING_DATA_PATH, GESTURE_ACTIONS)
 hand_detector = HandDetector()
 media_controller = MediaController(GESTURE_ACTIONS, cooldown_timer, gesture_queue)
 frame_processor = FrameProcessor(
