@@ -2,14 +2,20 @@
 
 # Setup
 
+**Required**  
+
 1. Clone the repo
 2. `cd` into the **root** directory
 3. Setup and activate a virtual env
 4. `pip install -r requirements.txt`
-5. Download the `gesture_dataset_sample` from [rhsslk3.ur.de](https://rhsslk3.ur.de/~sca04209/gesture_dataset_sample.zip)
-6. Unpack the downloaded archive into the **root** directory
 
 > 💡 `requirements.txt` includes `jupyter` and `ipykernel` so the virtual environment can also be used as a kernel for the notebook in the first task
+
+**Optional**  
+*Models and Notebooks are precompiled. These steps are only needed if you want to compile anything yourself*  
+
+5. Download the `gesture_dataset_sample` from [rhsslk3.ur.de](https://rhsslk3.ur.de/~sca04209/gesture_dataset_sample.zip)
+6. Unpack the downloaded archive into the **root** directory
 
 > 💡 The folder structure with the downloaded dataset should look like this
 ```
