@@ -67,7 +67,7 @@ def main(video_id: int, cam_width: int, cam_height: int) -> None:
             frame, (x, y, w, h, label, confidence) = result
             ui_drawer.draw_label_and_progress(frame, x, y, w, h, label, confidence)
             media_controller.update_state()
-            if not media_controller.in_cooldown() and confidence > 80:
+            if not media_controller.in_cooldown() and confidence > 95:
                 gesture_queue.append(label)
                 if gesture_queue.is_full_and_consistent(label) and label in GESTURE_ACTIONS:
                     media_controller.handle_prediction(label, gesture_queue.queue)
