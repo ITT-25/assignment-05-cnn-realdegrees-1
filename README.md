@@ -72,7 +72,7 @@ Based on the type of gesture a media action is performed using `pynput`.
 | Gesture | Action | Example |
 |---------|--------|---------|
 | stop | Stop Media Playback | <img src="docs/example_gestures/stop.jpg" width="150"> |
-| fist | Pause Media Playback | <img src="docs/example_gestures/fist.jpg" width="150"> |
+| fist | Pause/Play Media | <img src="docs/example_gestures/fist.jpg" width="150"> |
 | peace | Volume Down | <img src="docs/example_gestures/peace.jpg" width="150"> |
 | two_up | Volume Up | <img src="docs/example_gestures/two_up.jpg" width="150"> |
 
